@@ -1,0 +1,39 @@
+.env
+.env.local
+.env.production
+.env.*.local
+.env.example
+.env.example.*
+
+venv/
+.venv/
+env/
+ENV/
+
+# Скомпилированные файлы Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Дистрибутивы и сборки
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+parts/
+sdist/
+wheels/
+
+# Кэш и тесты
+.pytest_cache/
+.mypy_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+
+# Alembic (миграции SQLAlchemy)
+alembic/versions/*.pyc
