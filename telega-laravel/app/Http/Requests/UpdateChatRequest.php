@@ -24,6 +24,7 @@ class UpdateChatRequest extends FormRequest
     {
         return [
             'title' => ['sometimes', 'required', 'string', 'min:1', 'max:255'],
+            'user_ids.*' => ['sometimes', 'required', 'integer', 'exists:users,id'],
         ];
     }
 }

@@ -10,6 +10,9 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
+use Inertia\Inertia;
+use Inertia\Response;
+use Inertia\ResponseFactory;
 
 class ChatController extends Controller
 {
@@ -23,10 +26,12 @@ class ChatController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Factory|View
+    public function index(): Response|ResponseFactory
     {
-        $userChats = auth()->user()->chats;
-        return view('chat.index', compact('userChats'));
+        return Inertia::render('Chat/Index', [
+            'chats' => auth()->user()->chats,
+            'activeChat' => '',
+        ]);
     }
 
     /**
@@ -43,21 +48,20 @@ class ChatController extends Controller
      */
     public function store(StoreChatRequest $request): Redirector|RedirectResponse
     {
-        $validated = $request->validated();
+        $chat = $this->chatService->store($request->validated());
 
-        $chat = $this->chatService->store(
-            validated: $validated
-        );
-
-        return redirect(route('chat.show', $chat))->with('success', 'Чат успешно создан');
+        return to_route('chat.show', $chat->id);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Chat $chat): Factory|View
+    public function show(Chat $chat): Response
     {
-        return view('chat.show', compact('chat'));
+        return Inertia::render('Chat/Index', [
+            'chats' => auth()->user()->chats,
+            'activeChat' => $chat?->load('messages.user'),
+        ]);
     }
 
     /**
@@ -79,16 +83,17 @@ class ChatController extends Controller
             validated: $validated,
             chat: $chat
         );
-        return redirect(route('chat.show', $chat))->with('success', 'Чат успешно обновлен');
+        return back();
 
     }
 
     /**
      * Remove the specified resource from storage.
+     * @throws \Exception
      */
     public function destroy(Chat $chat): Redirector|RedirectResponse
     {
         $this->chatService->delete($chat);
-        return redirect(route('chat.index'))->with('success', 'Успешно удалено');
+        return to_route('chat.index');
     }
 }

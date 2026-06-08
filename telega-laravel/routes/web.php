@@ -1,19 +1,23 @@
 <?php
-require __DIR__.'/auth.php';
 
-use App\Http\Controllers\Auth\GitHubAuthController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MessageController;
-
+use App\Http\Controllers\ProfileController;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', function () {
-    return view('welcome');
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -22,9 +26,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::controller(GitHubAuthController::class)->group(function () {
-    Route::get('/auth/github/redirect', 'redirect')->name('github.redirect');
-    Route::get('/auth/github/callback',  'callback')->name('github.callback');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('chat', ChatController::class);
 });
 
-Route::resource('/chat', ChatController::class);
+require __DIR__.'/auth.php';

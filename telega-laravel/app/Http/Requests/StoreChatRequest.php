@@ -30,7 +30,8 @@ class StoreChatRequest extends FormRequest
                 'required',
                 'string',
                 Rule::in(Chat::TYPES),
-            ]
+            ],
+            'user_ids.*' => ['required', 'integer', 'exists:users,id'],
         ];
     }
 

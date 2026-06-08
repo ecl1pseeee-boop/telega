@@ -47,9 +47,9 @@ class MessageController extends Controller
                 validated: $validated,
                 chat: $chat
             );
-            return response()->json(['status' => 'success', 'message' => $message], 200);
+            return to_route('chat.show', $chat->id);
         } catch (\Throwable $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 422);
+            return to_route('chat.show', $chat->id);
         }
     }
 
@@ -75,9 +75,9 @@ class MessageController extends Controller
                 message: $message,
             );
 
-            return response()->json(['status' => 'success', 'message' => $message], 200);
+            return to_route('chat.show', $chat->id);
         } catch (\Throwable $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 422);
+            return to_route('chat.show', $chat->id);
         }
     }
 
@@ -89,9 +89,9 @@ class MessageController extends Controller
     {
         try {
             $this->messageService->destroy($message);
-            return response()->json(['status' => 'success', 'message' => 'Успешно удалено.'], 200);
+            return to_route('chat.show', $chat->id);
         } catch (\Throwable $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 422);
+            return to_route('chat.show', $chat->id);
         }
     }
 }

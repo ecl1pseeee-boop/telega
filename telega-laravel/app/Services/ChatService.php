@@ -19,6 +19,10 @@ class ChatService
 
                 $chat->members()->attach(auth()->id());
 
+                if(isset($validated['user_ids'])) {
+                    $chat->members()->syncWithoutDetaching($validated['user_ids']);
+                }
+
                 return $chat;
             });
 
@@ -45,6 +49,10 @@ class ChatService
                     'title' => $validated['title'] ?? $chat->title,
                 ]);
 
+                if(isset($validated['user_ids'])) {
+                    $chat->members()->sync($validated['user_ids']);
+                }
+
                 return $chat;
             });
 
@@ -70,9 +78,9 @@ class ChatService
         try {
             $old_chat_id = $chat->id;
             DB::transaction(function () use ($chat) {
-                $chat->delete();
                 $chat->members()->detach();
                 $chat->messages()->delete();
+                $chat->delete();
             });
 
             Log::info('Чат успешно удален:', [

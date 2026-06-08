@@ -1,5 +1,3 @@
-// resources/js/chat.js
-
 class ChatManager {
     constructor(chatId) {
         this.chatId = chatId;
@@ -37,7 +35,6 @@ class ChatManager {
         this.showLoading();
 
         try {
-            // Адаптируем URL под вашу структуру: /chat/{chat}/message?page=1
             const response = await fetch(`/api/chat/${this.chatId}/message?page=${this.currentPage}`, {
                 headers: {
                     'Accept': 'application/json',
@@ -56,14 +53,12 @@ class ChatManager {
             if (reset) {
                 this.messagesContainer.innerHTML = '';
                 this.currentPage = 1;
-                // Добавляем заголовок "Начало чата" после очистки
                 this.addChatHeader();
             }
 
             this.renderMessages(data.data);
             this.updateLoadMoreButton();
 
-            // Скроллим вниз только при загрузке новых сообщений (не при подгрузке старых)
             if (this.currentPage === this.lastPage || reset) {
                 this.scrollToBottom();
             } else {
@@ -87,14 +82,11 @@ class ChatManager {
     }
 
     renderMessages(messages) {
-        // Сохраняем старую высоту для сохранения позиции скролла
         const oldHeight = this.messagesContainer.scrollHeight;
 
         messages.forEach(message => {
-            // Проверяем, не добавлено ли уже это сообщение
             if (!document.querySelector(`.message-item[data-id="${message.id}"]`)) {
                 const messageElement = this.createMessageElement(message);
-                // Добавляем в начало контейнера для старых сообщений
                 if (this.currentPage > 1) {
                     this.messagesContainer.insertBefore(messageElement, this.messagesContainer.firstChild);
                 } else {
@@ -103,7 +95,6 @@ class ChatManager {
             }
         });
 
-        // Сохраняем позицию скролла при загрузке старых сообщений
         if (this.currentPage > 1) {
             const newHeight = this.messagesContainer.scrollHeight;
             this.messagesContainer.scrollTop = newHeight - oldHeight;
