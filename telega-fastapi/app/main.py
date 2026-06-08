@@ -3,11 +3,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import system
 from contextlib import asynccontextmanager
-from app.websocket.manager import redis_listener
+from app.websocket import manager, ws
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    task = asyncio.create_task(redis_listener())
+    task = asyncio.create_task(manager.redis_listener())
     yield
     task.cancel()
 
@@ -22,3 +22,4 @@ app.add_middleware(
 )
 
 app.include_router(system.router)
+app.include_router(ws.router)
