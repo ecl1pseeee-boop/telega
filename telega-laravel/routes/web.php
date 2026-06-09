@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserFriendsController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,6 +28,11 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('chat', ChatController::class);
+
+    Route::get('friends', [UserFriendsController::class, 'friends'])->name('friends.index');
+    Route::get('possible-friends', [UserFriendsController::class, 'possibleFriends'])->name('friends.possible');
+    Route::post('friends', [UserFriendsController::class, 'addFriends'])->name('friends.add');
+    Route::delete('friends', [UserFriendsController::class, 'removeFriends'])->name('friends.remove');
 });
 
 require __DIR__.'/auth.php';

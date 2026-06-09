@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { useForm, router } from '@inertiajs/react';
+import { usePage, useForm, router } from '@inertiajs/react';
 
 export default function ChatWindow({ chat }) {
     const { data, setData, post, reset } = useForm({ body: '' });
-
+    const { auth } = usePage().props;
+    const currentUserId = auth.user.id;
     // Состояние для редактирования
     const [editingId, setEditingId] = useState(null);
     const [editBody, setEditBody] = useState('');
 
     // Состояние для удаления (ID сообщения, которое хотим удалить)
     const [deleteId, setDeleteId] = useState(null);
+
 
     const sendMessage = (e) => {
         e.preventDefault();
@@ -39,26 +41,51 @@ export default function ChatWindow({ chat }) {
 
             {/* Список сообщений */}
             <div className="flex-1 p-4 overflow-y-auto space-y-2">
-                {chat.messages.map(msg => (
-                    <div key={msg.id} className="bg-white p-3 rounded shadow-sm flex justify-between">
-                        {editingId === msg.id ? (
-                            <input
-                                value={editBody}
-                                onChange={e => setEditBody(e.target.value)}
-                                className="border rounded px-2"
-                            />
-                        ) : <span>{msg.body}</span>}
+                {chat.messages.map(msg => {
+                    const isMine = msg.user_id === currentUserId;
 
-                        <div className="flex gap-2">
-                            {editingId === msg.id ? (
-                                <button onClick={() => updateMessage(msg.id)} className="text-green-600">Сохранить</button>
-                            ) : (
-                                <button onClick={() => { setEditingId(msg.id); setEditBody(msg.body); }} className="text-blue-600">Ред.</button>
-                            )}
-                            <button onClick={() => setDeleteId(msg.id)} className="text-red-500">Удалить</button>
+                    return (
+                        <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[70%] p-3 rounded-lg shadow-sm ${
+                                isMine ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'
+                            }`}>
+                                {/* Имя пользователя (только для чужих) */}
+                                {!isMine && (
+                                    <div className="text-xs font-bold mb-1 opacity-75">
+                                        {msg.user?.name || 'Пользователь'}
+                                    </div>
+                                )}
+
+                                {/* Тело сообщения */}
+                                {editingId === msg.id ? (
+                                    <input
+                                        value={editBody}
+                                        onChange={e => setEditBody(e.target.value)}
+                                        className="text-black border rounded px-1"
+                                    />
+                                ) : <span>{msg.body}</span>}
+
+                                {/* Кнопки управления (только для своих) */}
+                                {isMine && (
+                                    <div className="flex gap-2 mt-2 text-xs">
+                                        {editingId === msg.id ? (
+                                            <button onClick={() => updateMessage(msg.id)}
+                                                    className="underline">Сохранить</button>
+                                        ) : (
+                                            <button onClick={() => {
+                                                setEditingId(msg.id);
+                                                setEditBody(msg.body);
+                                            }} className="underline">Ред.</button>
+                                        )}
+                                        <button onClick={() => setDeleteId(msg.id)}
+                                                className="underline text-red-200">Удалить
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {/* Модальное окно удаления */}

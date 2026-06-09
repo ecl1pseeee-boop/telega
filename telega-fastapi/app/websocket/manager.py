@@ -15,9 +15,15 @@ class ConnectionManager:
             self.active_connections[chat_id] = []
         self.active_connections[chat_id].append(WebSocket)
     
+    # app/websocket/manager.py
     def disconnect(self, chat_id: int, websocket: WebSocket):
         if chat_id in self.active_connections:
-            self.active_connections[chat_id].remove(websocket)
+            if websocket in self.active_connections[chat_id]:
+                self.active_connections[chat_id].remove(websocket)
+            
+            # Удаляем ключ целиком, если список пуст
+            if not self.active_connections[chat_id]:
+                del self.active_connections[chat_id]
     
     async def broadcast(self, chat_id: int, message: str):
         if chat_id in self.active_connections:
@@ -27,15 +33,28 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 async def redis_listener():
-    r = redis.from_url(settings.REDIS_URL)
-    pubsub = r.pubsub()
-    await pubsub.subscribe("chat_channel")
+    while True:
+        try:
+            r = redis.from_url(
+                settings.REDIS_URL, 
+                decode_responses=True, 
+                socket_timeout=None,
+                socket_connect_timeout=10
+            )
+            pubsub = r.pubsub()
+            await pubsub.subscribe("chat_channel")
 
-    print("Подключение прошло успешно")
-    async for message in pubsub.listen():
-        if message['type'] == 'message':
-            payload = json.loads(message['data'].decode('utf-8'))
-            action = payload.get('action')
-            chat_id = payload['data']['chat_id']
-            message_data = payload['data']
-            await manager.broadcast(chat_id=chat_id, message=message_data)           
+            print("Подключение прошло успешно")
+            async for message in pubsub.listen():
+                if message['type'] == 'message':
+                    payload = json.loads(message['data'])
+                    action = payload.get('action')
+                    chat_id = payload['data']['chat_id']
+                    message_data = payload['data']
+                    print(f"Получено сообщение из Redis: {message_data}")
+                    await manager.broadcast(chat_id=chat_id, message=message_data)           
+        except Exception as e:
+            print(f"Ошибка в слушателе: {e}")
+        finally:
+            await pubsub.unsubscribe("chat_channel")
+            await r.close()

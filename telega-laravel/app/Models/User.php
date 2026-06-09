@@ -36,6 +36,8 @@ use Laravel\Passport\HasApiTokens;
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Chat> $ownerChats
  * @property-read int|null $owner_chats_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $friends
+ * @property-read int|null $friends_count
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
@@ -119,5 +121,12 @@ class User extends Authenticatable
      */
     public function ownerChats(): BelongsToMany {
         return $this->chats()->wherePivot('role', 'owner');
+    }
+
+    /*
+     * Все друзья пользователя
+     */
+    public function friends(): BelongsToMany {
+        return $this->belongsToMany(User::class, 'user_friends', 'user_id', 'friend_id');
     }
 }

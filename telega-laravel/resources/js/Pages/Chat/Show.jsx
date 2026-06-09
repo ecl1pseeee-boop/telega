@@ -11,9 +11,16 @@ export default function Show({ chat, messages : initialMessages }) {
     const [input, setInput] = useState('');
     const { auth } = usePage().props;
 
-    useEffect((e) => {
+    useEffect(() => {
+        const ws = new WebSocket(`ws://127.0.0.1:8001/ws/${chat.id}`);
+        ws.onmessage = (event) => {
+            const newMessage = JSON.parse(event.data);
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+        };
+        ws.onclose = () => console.log("WebSocket отключен");
+        return () => ws.close();
+    }, [chat.id]);
 
-    }, []);
     const sendMessage = async (e) => {
         e.preventDefault();
 
