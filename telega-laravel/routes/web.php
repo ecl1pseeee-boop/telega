@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Auth\GitHubAuthController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserFriendsController;
 use Illuminate\Foundation\Application;
@@ -34,5 +36,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('friends', [UserFriendsController::class, 'addFriends'])->name('friends.add');
     Route::delete('friends', [UserFriendsController::class, 'removeFriends'])->name('friends.remove');
 });
+
+Route::prefix('chat/{chat}')->group(function () {
+    Route::resource('message', MessageController::class);
+});
+
+
+Route::get('/auth/github', [GitHubAuthController::class, 'redirect'])->name('login.github');
+Route::get('/auth/github/callback', [GitHubAuthController::class, 'callback']);
 
 require __DIR__.'/auth.php';

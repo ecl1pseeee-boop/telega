@@ -112,6 +112,7 @@ class MessageService
                 'data' => [
                     'id' => $message->id,
                     'chat_id' => $message->chat_id,
+                    'user_id' => $message->user_id,
                     'body' => $message->body,
                     'author' => auth()->user()->name,
                     'created_at' => $message->created_at->toDateTimeString(),

@@ -30,6 +30,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
+                                <NavLink
+                                    href="/chat"
+                                    className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
+                                >
+                                    Перейти к чатам
+                                </NavLink>
                             </div>
                         </div>
 

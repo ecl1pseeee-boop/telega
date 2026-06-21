@@ -35,5 +35,5 @@ wheels/
 .coverage.*
 htmlcov/
 
-# Alembic (миграции SQLAlchemy)
+# Alembic
 alembic/versions/*.pyc

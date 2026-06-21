@@ -1,0 +1,23 @@
+# Виртуальные окружения (venv, env)
+venv/
+.venv/
+env/
+
+# Python байт-код
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Локальные секреты
+.env
+
+# Git и Docker
+.git
+.gitignore
+Dockerfile
+
+# Логи и базы данных (если вдруг создаются локально)
+*.log
+*.sqlite3
+db.sqlite3
