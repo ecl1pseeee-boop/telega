@@ -3,11 +3,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import system
 from contextlib import asynccontextmanager
-from app.websocket import manager, ws
+from app.websocket import ws
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    task = asyncio.create_task(manager.redis_listener())
+    task = asyncio.create_task(ws.redis_listener())
     yield
     task.cancel()
     try:

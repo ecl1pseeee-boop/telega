@@ -1,16 +1,49 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { usePage, useForm, router } from '@inertiajs/react';
 
 export default function ChatWindow({ chat }) {
     const { data, setData, post, reset } = useForm({ body: '' });
     const { auth } = usePage().props;
     const currentUserId = auth.user.id;
-    // Состояние для редактирования
+
     const [editingId, setEditingId] = useState(null);
     const [editBody, setEditBody] = useState('');
-
-    // Состояние для удаления (ID сообщения, которое хотим удалить)
     const [deleteId, setDeleteId] = useState(null);
+
+    const [messages, setMessages] = useState(chat.messages);
+
+    useEffect(() => {
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const ws = new WebSocket(`${protocol}://${window.location.host}/ws/${chat.id}`);
+
+        ws.onopen = () => console.log("Соединение установлено");
+        ws.onmessage = (event) => {
+            const payload = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+            const { action, data } = payload;
+            console.log("Действие:", action);
+            console.log("Данные:", data);
+
+            setMessages((prev) => {
+                switch (action) {
+                    case 'message.created':
+                        if (prev.find(m => m.id === data.id)) return prev;
+                        return [...prev, data];
+
+                    case 'message.updated':
+                        return prev.map(m => m.id === data.id ? { ...m, body: data.body, updated_at: data.updated_at } : m);
+
+                    case 'message.deleted':
+                        return prev.filter(m => m.id !== data.id);
+
+                    default:
+                        return prev;
+                }
+            });
+        };
+        ws.onclose = () => console.log("WebSocket отключен");
+
+        return () => ws.close();
+    }, [chat.id]);
 
 
     const sendMessage = (e) => {
@@ -29,10 +62,10 @@ export default function ChatWindow({ chat }) {
     };
 
     const deleteMessage = () => {
-        router.delete(route('message.destroy',{ chat: chat.id, message: deleteId }, {
+        router.delete(route('message.destroy',{ chat: chat.id, message: deleteId }), {
             preserveScroll: true,
             onSuccess: () => setDeleteId(null),
-        }));
+        });
     };
 
     return (
@@ -41,7 +74,7 @@ export default function ChatWindow({ chat }) {
 
             {/* Список сообщений */}
             <div className="flex-1 p-4 overflow-y-auto space-y-2">
-                {chat.messages.map(msg => {
+                {messages.map(msg => {
                     const isMine = msg.user_id === currentUserId;
 
                     return (
@@ -52,7 +85,7 @@ export default function ChatWindow({ chat }) {
                                 {/* Имя пользователя (только для чужих) */}
                                 {!isMine && (
                                     <div className="text-xs font-bold mb-1 opacity-75">
-                                        {msg.user?.name || 'Пользователь'}
+                                        {msg.user?.name || msg.author || 'Пользователь'}
                                     </div>
                                 )}
 

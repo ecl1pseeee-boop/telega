@@ -18,7 +18,7 @@ class UserFriendsController extends Controller
      */
     public function possibleFriends(Request $request) {
         $user = auth()->user();
-        $users = User::where('id', '!=', $user->id)->paginate(10);
+        $users = User::where('id', '!=', $user->id)->paginate(40);
         return response()->json($users);
     }
 
