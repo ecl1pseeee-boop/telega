@@ -19,12 +19,10 @@ class ConnectionManager:
                 del self.active_connections[chat_id]
     
     async def broadcast(self, chat_id: int, message: dict):
-        print(f"DEBUG: Пытаюсь отправить в чат {chat_id}. Активных: {len(self.active_connections.get(chat_id, []))}")
         if chat_id in self.active_connections:
             for connection in list(self.active_connections[chat_id]):
                 try:
                     await connection.send_json(message)
-                    print(f"DEBUG: Сообщение успешно отправлено в чат {chat_id}")
                 except Exception as e:
                     print(f"DEBUG: Ошибка отправки: {e}")
                     self.disconnect(chat_id, connection)
