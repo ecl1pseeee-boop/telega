@@ -1,0 +1,22 @@
+# Игнорировать локальные зависимости
+vendor/
+
+# Локальные файлы конфигурации и секреты
+.env
+.env.example
+
+# Git и Docker файлы
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+
+# Временные файлы и логи
+storage/logs/*.log
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+node_modules/
+public/hot
+public/storage
+bootstrap/cache/
