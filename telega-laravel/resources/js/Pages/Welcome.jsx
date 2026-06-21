@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import GithubLoginButton from '@/Components/GitHubLoginButton.jsx';
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const handleImageError = () => {
@@ -53,6 +54,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                         >
                                             Log in
                                         </Link>
+                                        <div className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white">
+                                            <GithubLoginButton />
+                                        </div>
                                         <Link
                                             href={route('register')}
                                             className="rounded-md px-3 py-2 text-black ring-1 ring-transparent transition hover:text-black/70 focus:outline-none focus-visible:ring-[#FF2D20] dark:text-white dark:hover:text-white/80 dark:focus-visible:ring-white"

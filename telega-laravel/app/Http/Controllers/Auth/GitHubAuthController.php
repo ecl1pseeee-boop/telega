@@ -19,7 +19,10 @@ class GitHubAuthController extends Controller
 
     public function callback(): RedirectResponse
     {
-        $githubUser = Socialite::driver('github')->setHttpClient(new \GuzzleHttp\Client(['verify' => env('SOCIALITE_VERIFY_SSL', true)]))->user();
+        $githubUser = Socialite::driver('github')
+            ->stateless()
+            ->setHttpClient(new \GuzzleHttp\Client(['verify' => env('SOCIALITE_VERIFY_SSL', true)]))
+            ->user();
 
         $user = User::updateOrCreate([
             'github_id'=> $githubUser->id,
@@ -30,7 +33,7 @@ class GitHubAuthController extends Controller
             'github_token' => $githubUser->token,
         ]);
 
-        Auth::login($user);
+        Auth::login($user, true);
 
         return redirect()->route('dashboard');
     }
