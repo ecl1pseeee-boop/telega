@@ -38,7 +38,6 @@ async def redis_listener():
                     chat_id = payload['data']['chat_id']
                     message_data = payload['data']
                     print(f"Получено сообщение из Redis: {message_data}")
-                    print(f"Получено сообщение из Redis: {action}")
                     full_data = {
                         "data": message_data,
                         "action": action

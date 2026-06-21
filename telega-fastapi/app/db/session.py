@@ -1,15 +1,16 @@
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from app.core.config import settings
 
-engine = create_async_engine(settings.DATABASE_URL, echo=True)
+engine = create_async_engine(settings.DATABASE_URL, echo=False)
 
 AsyncSessionLocal = async_sessionmaker(
     bind=engine,
     expire_on_commit=False,
-    autoflush=False
+    autoflush=False,
+    class_=AsyncSession
 )
 
-async def det_db():
+async def get_db():
     async with AsyncSessionLocal() as session:
         try:
             yield session

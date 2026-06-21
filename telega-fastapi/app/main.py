@@ -5,6 +5,7 @@ from app.api import system
 from contextlib import asynccontextmanager
 from app.websocket import ws
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     task = asyncio.create_task(ws.redis_listener())
@@ -15,7 +16,13 @@ async def lifespan(app: FastAPI):
     except asyncio.CancelledError:
         pass
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title="Chat API",
+    servers=[
+        {"url": "https://telega.local/api", "description": "Production server"}
+    ],
+    lifespan=lifespan,
+)
 
 app.add_middleware(
      CORSMiddleware,
